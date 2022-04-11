@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Color, Icon, List } from '@raycast/api'
+import { Action, ActionPanel, Clipboard, Color, Icon, List } from '@raycast/api'
 import { useState, ReactElement } from "react";
 
 interface User {
@@ -12,42 +12,75 @@ function avatarUrl(user: User) {
 }
 
 export default function Command() {
-  const [coauthors, setcoauthors] = useState<User[]>([
+  const [coauthors, setCoauthors] = useState<User[]>([]);
+  const [users, _setusers] = useState<User[]>([
     { name: "Alice", handle: "alice", email: "alice@hi.com" },
     { name: "Bob", handle: "bob", email: "bob@hey.com" },
   ]);
 
   const removeCoauthor = (user: User) => {
-    setcoauthors(coauthors.filter(u => u !== user));
+    setCoauthors(coauthors.filter(u => u !== user));
+  }
+
+  const addCoauthor = (user: User) => {
+    setCoauthors(coauthors.concat(user));
   }
 
   return (
     <List>
-      {coauthors.map((user) => (
-        <List.Item
-          key={user.name}
-          title={user.name}
-          subtitle={user.email}
-          icon={avatarUrl(user)}
-          actions={<Actions coauthor={user} removeCoauthor={removeCoauthor} />}
-        />
-      ))}
+      <List.Section title="Co-authors">
+        {coauthors.map((coauthor) => (
+          <List.Item
+            key={coauthor.name}
+            title={coauthor.name}
+            subtitle={coauthor.email}
+            icon={avatarUrl(coauthor)}
+            actions={<Actions coauthors={coauthors} user={coauthor} userAction={removeCoauthor} />}
+          />
+        ))}
+      </List.Section>
+      <List.Section title="Possible co-authors">
+        {users.map((user) => (
+          <List.Item
+            key={user.name}
+            title={user.name}
+            subtitle={user.email}
+            icon={avatarUrl(user)}
+            actions={<Actions coauthors={coauthors} user={user} userAction={addCoauthor} />}
+          />
+        ))}
+      </List.Section>
     </List>
   );
 }
 
-interface ActionsProps {
-  coauthor: User;
-  removeCoauthor: (coauthor: User) => void;
+const copy = async (text: string) => {
+  await Clipboard.copy(text);
 }
 
-function Actions({coauthor, removeCoauthor}: ActionsProps): ReactElement {
+const coauthorshipText = (coauthors: User[]) => {
+  return coauthors.map(coauthor => (
+    `Co-authored-by: ${coauthor.name} <${coauthor.email}>`
+  )).join('\n');
+}
+
+interface ActionsProps {
+  coauthors: User[];
+  user: User;
+  userAction: (coauthor: User) => void;
+}
+
+function Actions({coauthors, user, userAction}: ActionsProps): ReactElement {
   return (
     <ActionPanel>
       <Action
+        title="Copy to clipboard"
+        onAction={() => copy(coauthorshipText(coauthors))}
+      />
+      <Action
         title="Remove from list"
         icon={{ source: Icon.Trash, tintColor: Color.Red }}
-        onAction={() => removeCoauthor(coauthor)}
+        onAction={() => userAction(user)}
         shortcut={{ modifiers: ["cmd"], key: "d" }}
       />
     </ActionPanel>
