@@ -35,7 +35,7 @@ export default function Command() {
             title={coauthor.name}
             subtitle={coauthor.email}
             icon={avatarUrl(coauthor)}
-            actions={<Actions coauthors={coauthors} user={coauthor} userAction={removeCoauthor} />}
+            actions={<SelectedCoauthorActions coauthors={coauthors} user={coauthor} userAction={removeCoauthor} />}
           />
         ))}
       </List.Section>
@@ -46,7 +46,7 @@ export default function Command() {
             title={user.name}
             subtitle={user.email}
             icon={avatarUrl(user)}
-            actions={<Actions coauthors={coauthors} user={user} userAction={addCoauthor} />}
+            actions={<UnselectedCoauthorActions coauthors={coauthors} user={user} userAction={addCoauthor} />}
           />
         ))}
       </List.Section>
@@ -70,18 +70,37 @@ interface ActionsProps {
   userAction: (coauthor: User) => void;
 }
 
-function Actions({coauthors, user, userAction}: ActionsProps): ReactElement {
+function SelectedCoauthorActions({coauthors, user, userAction}: ActionsProps): ReactElement {
   return (
     <ActionPanel>
-      <Action
-        title="Copy to clipboard"
-        onAction={() => copy(coauthorshipText(coauthors))}
-      />
       <Action
         title="Remove from list"
         icon={{ source: Icon.Trash, tintColor: Color.Red }}
         onAction={() => userAction(user)}
         shortcut={{ modifiers: ["cmd"], key: "d" }}
+      />
+      <Action
+        title="Copy authors to clipboard"
+        onAction={() => copy(coauthorshipText(coauthors))}
+        icon={{ source: Icon.Clipboard }}
+      />
+    </ActionPanel>
+  )
+}
+
+function UnselectedCoauthorActions({coauthors, user, userAction}: ActionsProps): ReactElement {
+  return (
+    <ActionPanel>
+      <Action
+        title="Add to list"
+        icon={{ source: Icon.Plus, tintColor: Color.Green }}
+        onAction={() => userAction(user)}
+        shortcut={{ modifiers: ["cmd"], key: "a" }}
+      />
+      <Action
+        title="Copy authors to clipboard"
+        onAction={() => copy(coauthorshipText(coauthors))}
+        icon={{ source: Icon.Clipboard }}
       />
     </ActionPanel>
   )
