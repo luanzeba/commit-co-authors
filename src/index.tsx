@@ -13,17 +13,19 @@ function avatarUrl(user: User) {
 
 export default function Command() {
   const [coauthors, setCoauthors] = useState<User[]>([]);
-  const [users, _setusers] = useState<User[]>([
+  const [users, setUsers] = useState<User[]>([
     { name: "Alice", handle: "alice", email: "alice@hi.com" },
     { name: "Bob", handle: "bob", email: "bob@hey.com" },
   ]);
 
   const removeCoauthor = (user: User) => {
     setCoauthors(coauthors.filter(u => u !== user));
+    setUsers(users.concat(user));
   }
 
   const addCoauthor = (user: User) => {
     setCoauthors(coauthors.concat(user));
+    setUsers(users.filter(u => u !== user));
   }
 
   return (
