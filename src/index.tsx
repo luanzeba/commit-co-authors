@@ -1,22 +1,14 @@
-import { Action, ActionPanel, Clipboard, Color, Icon, List } from '@raycast/api'
-import { useState, ReactElement } from "react";
+import { List, environment} from '@raycast/api'
+import { useState } from "react";
+import fs from "fs";
 
-interface User {
-  name: string;
-  handle: string;
-  email: string;
-}
+import { User, avatarUrl, loadUsers } from './users';
+import { SelectedCoauthorActions, UnselectedCoauthorActions } from './actions';
 
-function avatarUrl(user: User) {
-  return `https://www.github.com/${user.handle}.png`;
-}
 
 export default function Command() {
   const [coauthors, setCoauthors] = useState<User[]>([]);
-  const [users, setUsers] = useState<User[]>([
-    { name: "Alice", handle: "alice", email: "alice@hi.com" },
-    { name: "Bob", handle: "bob", email: "bob@hey.com" },
-  ]);
+  const [users, setUsers] = useState<User[]>(loadUsers());
 
   const removeCoauthor = (user: User) => {
     setCoauthors(coauthors.filter(u => u !== user));
@@ -55,56 +47,3 @@ export default function Command() {
     </List>
   );
 }
-
-const copy = async (text: string) => {
-  await Clipboard.copy(text);
-}
-
-const coauthorshipText = (coauthors: User[]) => {
-  return coauthors.map(coauthor => (
-    `Co-authored-by: ${coauthor.name} <${coauthor.email}>`
-  )).join('\n');
-}
-
-interface ActionsProps {
-  coauthors: User[];
-  user: User;
-  userAction: (coauthor: User) => void;
-}
-
-function SelectedCoauthorActions({coauthors, user, userAction}: ActionsProps): ReactElement {
-  return (
-    <ActionPanel>
-      <Action
-        title="Remove from list"
-        icon={{ source: Icon.Trash, tintColor: Color.Red }}
-        onAction={() => userAction(user)}
-        shortcut={{ modifiers: ["cmd"], key: "d" }}
-      />
-      <Action
-        title="Copy authors to clipboard"
-        onAction={() => copy(coauthorshipText(coauthors))}
-        icon={{ source: Icon.Clipboard }}
-      />
-    </ActionPanel>
-  )
-}
-
-function UnselectedCoauthorActions({coauthors, user, userAction}: ActionsProps): ReactElement {
-  return (
-    <ActionPanel>
-      <Action
-        title="Add to list"
-        icon={{ source: Icon.Plus, tintColor: Color.Green }}
-        onAction={() => userAction(user)}
-        shortcut={{ modifiers: ["cmd"], key: "a" }}
-      />
-      <Action
-        title="Copy authors to clipboard"
-        onAction={() => copy(coauthorshipText(coauthors))}
-        icon={{ source: Icon.Clipboard }}
-      />
-    </ActionPanel>
-  )
-}
-
