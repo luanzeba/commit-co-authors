@@ -1,4 +1,4 @@
-import { Action, ActionPanel, clearSearchBar, Icon, List, showToast, Toast } from '@raycast/api'
+import { Action, ActionPanel, clearSearchBar, Icon, List, showToast, Toast } from '@raycast/api';
 import { ReactElement, useState } from "react";
 
 import { User, avatarUrl, loadUsers } from './users';
@@ -12,14 +12,16 @@ export default ({switchMode} : Props) => {
   const [coauthors, setCoauthors] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>(loadUsers());
 
-  const removeCoauthor = (user: User) => {
+  const removeCoauthor = async (user: User) => {
     setCoauthors(coauthors.filter(u => u !== user));
     setUsers(users.concat(user));
+    await clearSearchBar();
   }
 
-  const addCoauthor = (user: User) => {
+  const addCoauthor = async (user: User) => {
     setCoauthors(coauthors.concat(user));
     setUsers(users.filter(u => u !== user));
+    await clearSearchBar();
   }
 
   return (

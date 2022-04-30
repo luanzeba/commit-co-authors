@@ -12,8 +12,8 @@
   "commands": [
     {
       "name": "index",
-      "title": "Commit co-authors",
-      "description": "Template with a plain detail view",
+      "title": "Select coauthors",
+      "description": "Copy coauthor text for commit message",
       "mode": "view"
     }
   ],

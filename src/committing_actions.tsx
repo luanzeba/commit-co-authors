@@ -1,10 +1,17 @@
-import { Action, ActionPanel, clearSearchBar, Clipboard, Color, Icon, showToast, Toast } from '@raycast/api'
+import { Action, ActionPanel, clearSearchBar, Clipboard, Color, Icon, popToRoot, showHUD, showToast, Toast } from '@raycast/api';
 import { ReactElement } from 'react';
 
 import { User } from './users';
 
-const copy = async (text: string) => {
-  await Clipboard.copy(text);
+const copyAuthorsToClipboard = async (coauthors: User[]) => {
+  const text = coauthorshipText(coauthors);
+  if (text) {
+    await Clipboard.copy(text);
+    await popToRoot({ clearSearchBar: true })
+    await showHUD("Authors copied");
+  } else {
+    await showToast(Toast.Style.Failure, "No authors selected");
+  }
 }
 
 const coauthorshipText = (coauthors: User[]) => {
@@ -12,6 +19,48 @@ const coauthorshipText = (coauthors: User[]) => {
     `Co-authored-by: ${coauthor.name} <${coauthor.email}>`
   )).join('\n');
 }
+
+const CopyAuthorsAction = (props: { coauthors: User[] }): ReactElement => {
+  const { coauthors } = props;
+
+  return (
+    <Action
+      title="Copy authors to clipboard"
+      onAction={() => copyAuthorsToClipboard(coauthors)}
+      icon={{ source: Icon.Clipboard }}
+    />
+  );
+}
+
+const CopyUserAction = (props: { user: User }): ReactElement => {
+  const { user } = props;
+
+  return (
+    <Action
+      title="Copy user to clipboard"
+      onAction={() => copyAuthorsToClipboard([user])}
+      icon={{ source: Icon.Clipboard, tintColor: Color.Magenta}}
+      shortcut={{ key: "y", modifiers: ["cmd"] }}
+    />
+  );
+}
+
+const SwitchToEditingMode = (props: { switchMode: () => void }): ReactElement => {
+  const { switchMode } = props;
+
+  return(
+    <Action
+      title={"Switch to editing mode"}
+      onAction={async () => {
+        await showToast(Toast.Style.Success, "Switched to editing mode.");
+        switchMode();
+        await clearSearchBar();
+      }}
+      icon={{ source: Icon.Pencil }}
+      shortcut={{ key: "s", modifiers: ["cmd"] }}
+    />
+  );
+};
 
 interface ActionsProps {
   coauthors: User[];
@@ -29,21 +78,9 @@ export const SelectedCoauthorActions = ({coauthors, user, userAction, switchMode
         onAction={() => userAction(user)}
         shortcut={{ modifiers: ["cmd"], key: "d" }}
       />
-      <Action
-        title="Copy authors to clipboard"
-        onAction={() => copy(coauthorshipText(coauthors))}
-        icon={{ source: Icon.Clipboard }}
-      />
-      <Action
-        title={"Switch to editing mode"}
-        onAction={async () => {
-          await showToast(Toast.Style.Success, "Switched to editing mode.");
-          switchMode();
-          await clearSearchBar();
-        }}
-        icon={{ source: Icon.Pencil }}
-        shortcut={{ key: "s", modifiers: ["cmd"] }}
-      />
+      <CopyAuthorsAction coauthors={coauthors} />
+      <CopyUserAction user={user} />
+      <SwitchToEditingMode switchMode={switchMode} />
     </ActionPanel>
   )
 }
@@ -57,21 +94,9 @@ export const UnselectedCoauthorActions = ({coauthors, user, userAction, switchMo
         onAction={() => userAction(user)}
         shortcut={{ modifiers: ["cmd"], key: "a" }}
       />
-      <Action
-        title="Copy authors to clipboard"
-        onAction={() => copy(coauthorshipText(coauthors))}
-        icon={{ source: Icon.Clipboard }}
-      />
-      <Action
-        title={"Switch to editing mode"}
-        onAction={async () => {
-          await showToast(Toast.Style.Success, "Switched to editing mode.");
-          switchMode();
-          await clearSearchBar();
-        }}
-        icon={{ source: Icon.Pencil }}
-        shortcut={{ key: "s", modifiers: ["cmd"] }}
-      />
+      <CopyAuthorsAction coauthors={coauthors} />
+      <CopyUserAction user={user} />
+      <SwitchToEditingMode switchMode={switchMode} />
     </ActionPanel>
   )
 }
