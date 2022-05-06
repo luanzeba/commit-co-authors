@@ -67,7 +67,7 @@ const DeleteUserAction = (props: { user: User, onDelete: (user: User) => void })
   );
 }
 
-const SwitchToEditingModeAction = (props: { switchMode: () => void }): ReactElement => {
+export const SwitchToEditingModeAction = (props: { switchMode: () => void }): ReactElement => {
   const { switchMode } = props;
 
   return(
@@ -92,7 +92,7 @@ interface ActionsProps {
   switchMode: () => void;
 }
 
-export const SelectedCoauthorActions = ({coauthors, onDelete, user, userAction, switchMode}: ActionsProps): ReactElement => {
+export const CoauthorActions = ({coauthors, onDelete, user, userAction, switchMode}: ActionsProps): ReactElement => {
   return (
     <ActionPanel>
       <Action
@@ -109,7 +109,7 @@ export const SelectedCoauthorActions = ({coauthors, onDelete, user, userAction, 
   )
 }
 
-export const UnselectedCoauthorActions = ({coauthors, onDelete, user, userAction, switchMode}: ActionsProps): ReactElement => {
+export const UserActions = ({coauthors, onDelete, user, userAction, switchMode}: ActionsProps): ReactElement => {
   return (
     <ActionPanel>
       <Action

@@ -1,8 +1,8 @@
-import { Action, ActionPanel, clearSearchBar, Icon, List, showToast, Toast } from '@raycast/api';
-import { ReactElement, useState } from "react";
+import { ActionPanel, clearSearchBar, Icon, List, showToast, Toast } from '@raycast/api';
+import { useState } from "react";
 
 import { User, avatarUrl, loadUsers } from './users';
-import { SelectedCoauthorActions, UnselectedCoauthorActions } from './committing_actions';
+import { CoauthorActions, UserActions, SwitchToEditingModeAction } from './committing_actions';
 
 interface Props {
   switchMode: () => void;
@@ -30,7 +30,7 @@ export default ({switchMode} : Props) => {
   }
 
   return (
-    <List actions={<SwitchModeAction switchMode={switchMode} />}>
+    <List actions={<ActionPanel><SwitchToEditingModeAction switchMode={switchMode} /></ActionPanel>}>
       <List.Section title="Co-authors">
         {coauthors.map((coauthor) => (
           <List.Item
@@ -39,7 +39,7 @@ export default ({switchMode} : Props) => {
             subtitle={coauthor.email}
             icon={avatarUrl(coauthor)}
             actions={
-              <SelectedCoauthorActions
+              <CoauthorActions
                 coauthors={coauthors}
                 onDelete={onDelete}
                 user={coauthor}
@@ -57,7 +57,7 @@ export default ({switchMode} : Props) => {
             subtitle={user.email}
             icon={avatarUrl(user)}
             actions={
-              <UnselectedCoauthorActions
+              <UserActions
                 coauthors={coauthors}
                 onDelete={onDelete}
                 user={user}
@@ -70,20 +70,3 @@ export default ({switchMode} : Props) => {
     </List>
   );
 }
-
-// TODO: Extract this elsewhere
-const SwitchModeAction = ({switchMode}: Props): ReactElement => (
-  <ActionPanel>
-    <Action
-      title={"Switch to editing mode"}
-      onAction={async () => {
-        await showToast(Toast.Style.Success, "Switched to editing mode.");
-        switchMode();
-        await clearSearchBar();
-      }}
-      icon={{ source: Icon.Pencil }}
-      shortcut={{ key: "s", modifiers: ["cmd"] }}
-    />
-  </ActionPanel>
-);
-
