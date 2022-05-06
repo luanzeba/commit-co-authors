@@ -1,13 +1,14 @@
-import { Action, ActionPanel, clearSearchBar, Icon, showToast, Toast } from "@raycast/api";
-import { ReactElement } from "react";
+import { Action, ActionPanel, clearSearchBar, Form, Icon, showToast, Toast } from "@raycast/api";
+import { MutableRefObject, ReactElement } from "react";
 
 import { createUser, User } from "./users";
 
 interface ActionProps {
+  refs: MutableRefObject<Form.TextField>[];
   switchMode: () => void;
 }
 
-export const AddUserActions = ({switchMode}: ActionProps): ReactElement => {
+export const AddUserActions = ({refs, switchMode}: ActionProps): ReactElement => {
   async function handleSubmit(values: User) {
     if (!values.name || !values.handle || !values.email) {
       showToast({
@@ -27,6 +28,8 @@ export const AddUserActions = ({switchMode}: ActionProps): ReactElement => {
 
       toast.style = Toast.Style.Success;
       toast.title = "User added";
+      refs.forEach((ref) => ref.current?.reset());
+      refs.at(0)?.current?.focus();
     } catch (error) {
       toast.style = Toast.Style.Failure;
       toast.title = "Failed to add user";

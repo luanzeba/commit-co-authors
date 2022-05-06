@@ -1,4 +1,5 @@
 import { Form } from "@raycast/api";
+import { useRef } from "react";
 
 import { AddUserActions } from "./editing_actions";
 
@@ -7,11 +8,15 @@ interface Props {
 }
 
 export default ({switchMode} : Props) => {
+  const nameField = useRef<Form.TextField>(null)
+  const handleField = useRef<Form.TextField>(null);
+  const emailField = useRef<Form.TextField>(null);
+
   return (
-    <Form actions={<AddUserActions switchMode={switchMode} />} >
-      <Form.TextField id="name" title="name" defaultValue="" />
-      <Form.TextField id="handle" title="handle" defaultValue="" />
-      <Form.TextField id="email" title="email" defaultValue="" />
+    <Form actions={<AddUserActions switchMode={switchMode} refs={[nameField, handleField, emailField]} />} >
+      <Form.TextField id="name" title="Name" ref={nameField} />
+      <Form.TextField id="handle" title="GitHub handle" ref={handleField} />
+      <Form.TextField id="email" title="Email" ref={emailField} />
     </Form>
   );
 }
