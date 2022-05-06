@@ -16,6 +16,12 @@ export const createUser = (user: User): User => {
   return user;
 }
 
+export const deleteUser = (user: User): User => {
+  const newUsers = loadUsers().filter(u => u.handle !== user.handle);
+  fs.writeFileSync(USERS_FILE, JSON.stringify(newUsers));
+  return user;
+}
+
 export const loadUsers = (): User[] => {
   try {
     const users = fs.readFileSync(USERS_FILE, 'utf8');

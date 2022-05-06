@@ -1,7 +1,7 @@
 import { Action, ActionPanel, clearSearchBar, Clipboard, Color, Icon, popToRoot, showHUD, showToast, Toast } from '@raycast/api';
 import { ReactElement } from 'react';
 
-import { User } from './users';
+import { deleteUser, User } from './users';
 
 const copyAuthorsToClipboard = async (coauthors: User[]) => {
   const text = coauthorshipText(coauthors);
@@ -45,7 +45,29 @@ const CopyUserAction = (props: { user: User }): ReactElement => {
   );
 }
 
-const SwitchToEditingMode = (props: { switchMode: () => void }): ReactElement => {
+const DeleteUserAction = (props: { user: User, onDelete: (user: User) => void }): ReactElement => {
+  const { onDelete, user } = props;
+
+  return (
+    <Action
+      title="Delete user"
+      onAction={async () => {
+        try {
+          deleteUser(user);
+          onDelete(user);
+          await showToast(Toast.Style.Success, "User deleted");
+          await clearSearchBar();
+        } catch (e) {
+          await showToast(Toast.Style.Failure, "User could not be deleted", String(e));
+        }
+      }}
+      icon={{ source: Icon.Trash }}
+      shortcut={{ key: "d", modifiers: ["cmd"] }}
+    />
+  );
+}
+
+const SwitchToEditingModeAction = (props: { switchMode: () => void }): ReactElement => {
   const { switchMode } = props;
 
   return(
@@ -64,12 +86,13 @@ const SwitchToEditingMode = (props: { switchMode: () => void }): ReactElement =>
 
 interface ActionsProps {
   coauthors: User[];
+  onDelete: (user: User) => void;
   user: User;
   userAction: (coauthor: User) => void;
   switchMode: () => void;
 }
 
-export const SelectedCoauthorActions = ({coauthors, user, userAction, switchMode}: ActionsProps): ReactElement => {
+export const SelectedCoauthorActions = ({coauthors, onDelete, user, userAction, switchMode}: ActionsProps): ReactElement => {
   return (
     <ActionPanel>
       <Action
@@ -80,12 +103,13 @@ export const SelectedCoauthorActions = ({coauthors, user, userAction, switchMode
       />
       <CopyAuthorsAction coauthors={coauthors} />
       <CopyUserAction user={user} />
-      <SwitchToEditingMode switchMode={switchMode} />
+      <DeleteUserAction user={user} onDelete={onDelete} />
+      <SwitchToEditingModeAction switchMode={switchMode} />
     </ActionPanel>
   )
 }
 
-export const UnselectedCoauthorActions = ({coauthors, user, userAction, switchMode}: ActionsProps): ReactElement => {
+export const UnselectedCoauthorActions = ({coauthors, onDelete, user, userAction, switchMode}: ActionsProps): ReactElement => {
   return (
     <ActionPanel>
       <Action
@@ -96,7 +120,8 @@ export const UnselectedCoauthorActions = ({coauthors, user, userAction, switchMo
       />
       <CopyAuthorsAction coauthors={coauthors} />
       <CopyUserAction user={user} />
-      <SwitchToEditingMode switchMode={switchMode} />
+      <DeleteUserAction user={user} onDelete={onDelete} />
+      <SwitchToEditingModeAction switchMode={switchMode} />
     </ActionPanel>
   )
 }

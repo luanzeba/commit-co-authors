@@ -24,6 +24,11 @@ export default ({switchMode} : Props) => {
     await clearSearchBar();
   }
 
+  const onDelete = (user: User) => {
+    setCoauthors(coauthors.filter(u => u !== user));
+    setUsers(users.filter(u => u !== user));
+  }
+
   return (
     <List actions={<SwitchModeAction switchMode={switchMode} />}>
       <List.Section title="Co-authors">
@@ -36,6 +41,7 @@ export default ({switchMode} : Props) => {
             actions={
               <SelectedCoauthorActions
                 coauthors={coauthors}
+                onDelete={onDelete}
                 user={coauthor}
                 userAction={removeCoauthor}
                 switchMode={switchMode}
@@ -53,6 +59,7 @@ export default ({switchMode} : Props) => {
             actions={
               <UnselectedCoauthorActions
                 coauthors={coauthors}
+                onDelete={onDelete}
                 user={user}
                 userAction={addCoauthor}
                 switchMode={switchMode}
