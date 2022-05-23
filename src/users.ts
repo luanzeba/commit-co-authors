@@ -10,6 +10,11 @@ export interface User {
   email: string;
 }
 
+const findByHandle = (handle: string): User | undefined => {
+  const users = loadUsers();
+  return users.find(user => user.handle === handle);
+}
+
 export const createUser = (user: User): User => {
   const newUsers = [...loadUsers(), user];
   fs.writeFileSync(USERS_FILE, JSON.stringify(newUsers));
@@ -19,6 +24,13 @@ export const createUser = (user: User): User => {
 export const deleteUser = (user: User): User => {
   const newUsers = loadUsers().filter(u => u.handle !== user.handle);
   fs.writeFileSync(USERS_FILE, JSON.stringify(newUsers));
+  return user;
+}
+
+export const editUser = (user: User, oldHandle: string): User => {
+  const oldUser = findByHandle(oldHandle);
+  oldUser && deleteUser(oldUser);
+  createUser(user);
   return user;
 }
 

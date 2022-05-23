@@ -1,14 +1,10 @@
-import { ActionPanel, clearSearchBar, Icon, List, showToast, Toast } from '@raycast/api';
-import { useState } from "react";
+import { ActionPanel, clearSearchBar, List } from '@raycast/api';
+import { useEffect, useState } from "react";
 
 import { User, avatarUrl, loadUsers } from './users';
-import { CoauthorActions, UserActions, SwitchToEditingModeAction } from './committing_actions';
+import { CoauthorActionPanel, UserActionPanel, CreateUserAction } from './user_list_actions';
 
-interface Props {
-  switchMode: () => void;
-}
-
-export default ({switchMode} : Props) => {
+export default () => {
   const [coauthors, setCoauthors] = useState<User[]>([]);
   const [users, setUsers] = useState<User[]>(loadUsers());
 
@@ -30,7 +26,7 @@ export default ({switchMode} : Props) => {
   }
 
   return (
-    <List actions={<ActionPanel><SwitchToEditingModeAction switchMode={switchMode} /></ActionPanel>}>
+    <List actions={<ActionPanel><CreateUserAction /></ActionPanel>}>
       <List.Section title="Co-authors">
         {coauthors.map((coauthor) => (
           <List.Item
@@ -39,12 +35,11 @@ export default ({switchMode} : Props) => {
             subtitle={coauthor.email}
             icon={avatarUrl(coauthor)}
             actions={
-              <CoauthorActions
+              <CoauthorActionPanel
                 coauthors={coauthors}
                 onDelete={onDelete}
                 user={coauthor}
                 userAction={removeCoauthor}
-                switchMode={switchMode}
               />}
           />
         ))}
@@ -57,12 +52,11 @@ export default ({switchMode} : Props) => {
             subtitle={user.email}
             icon={avatarUrl(user)}
             actions={
-              <UserActions
+              <UserActionPanel
                 coauthors={coauthors}
                 onDelete={onDelete}
                 user={user}
                 userAction={addCoauthor}
-                switchMode={switchMode}
               />}
           />
         ))}
