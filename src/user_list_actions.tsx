@@ -1,26 +1,36 @@
-import { Action, ActionPanel, clearSearchBar, Clipboard, Color, Icon, popToRoot, showHUD, showToast, Toast, useNavigation } from '@raycast/api';
-import { ReactElement } from 'react';
+import {
+  Action,
+  ActionPanel,
+  clearSearchBar,
+  Clipboard,
+  Color,
+  Icon,
+  popToRoot,
+  showHUD,
+  showToast,
+  Toast,
+  useNavigation,
+} from "@raycast/api";
+import { ReactElement } from "react";
 
-import { deleteUser, User } from './users';
-import CreateUserForm from './create_user_form';
-import EditUserForm from './edit_user_form';
+import { deleteUser, User } from "./users";
+import CreateUserForm from "./create_user_form";
+import EditUserForm from "./edit_user_form";
 
 const copyAuthorsToClipboard = async (coauthors: User[]) => {
   const text = coauthorshipText(coauthors);
   if (text) {
     await Clipboard.copy(text);
-    await popToRoot({ clearSearchBar: true })
+    await popToRoot({ clearSearchBar: true });
     await showHUD("Authors copied");
   } else {
     await showToast(Toast.Style.Failure, "No authors selected");
   }
-}
+};
 
 const coauthorshipText = (coauthors: User[]) => {
-  return coauthors.map(coauthor => (
-    `Co-authored-by: ${coauthor.name} <${coauthor.email}>`
-  )).join('\n');
-}
+  return coauthors.map((coauthor) => `Co-authored-by: ${coauthor.name} <${coauthor.email}>`).join("\n");
+};
 
 const CopyAuthorsAction = (props: { coauthors: User[] }): ReactElement => {
   const { coauthors } = props;
@@ -32,7 +42,7 @@ const CopyAuthorsAction = (props: { coauthors: User[] }): ReactElement => {
       icon={{ source: Icon.Clipboard }}
     />
   );
-}
+};
 
 const CopyUserAction = (props: { user: User }): ReactElement => {
   const { user } = props;
@@ -41,13 +51,13 @@ const CopyUserAction = (props: { user: User }): ReactElement => {
     <Action
       title="Copy user to clipboard"
       onAction={() => copyAuthorsToClipboard([user])}
-      icon={{ source: Icon.Clipboard, tintColor: Color.Magenta}}
+      icon={{ source: Icon.Clipboard, tintColor: Color.Magenta }}
       shortcut={{ key: "y", modifiers: ["cmd"] }}
     />
   );
-}
+};
 
-const DeleteUserAction = (props: { user: User, onDelete: (user: User) => void }): ReactElement => {
+const DeleteUserAction = (props: { user: User; onDelete: (user: User) => void }): ReactElement => {
   const { onDelete, user } = props;
 
   return (
@@ -67,7 +77,7 @@ const DeleteUserAction = (props: { user: User, onDelete: (user: User) => void })
       shortcut={{ key: "d", modifiers: ["cmd"] }}
     />
   );
-}
+};
 
 export const CreateUserAction = (): ReactElement => {
   const { push } = useNavigation();
@@ -108,7 +118,7 @@ interface ActionsProps {
   userAction: (coauthor: User) => void;
 }
 
-export const CoauthorActionPanel = ({coauthors, onDelete, user, userAction}: ActionsProps): ReactElement => {
+export const CoauthorActionPanel = ({ coauthors, onDelete, user, userAction }: ActionsProps): ReactElement => {
   return (
     <ActionPanel>
       <ActionPanel.Section title="Copy">
@@ -127,10 +137,10 @@ export const CoauthorActionPanel = ({coauthors, onDelete, user, userAction}: Act
         <EditUserAction user={user} />
       </ActionPanel.Section>
     </ActionPanel>
-  )
-}
+  );
+};
 
-export const UserActionPanel = ({coauthors, onDelete, user, userAction}: ActionsProps): ReactElement => {
+export const UserActionPanel = ({ coauthors, onDelete, user, userAction }: ActionsProps): ReactElement => {
   return (
     <ActionPanel>
       <ActionPanel.Section title="Copy">
@@ -149,6 +159,5 @@ export const UserActionPanel = ({coauthors, onDelete, user, userAction}: Actions
         <EditUserAction user={user} />
       </ActionPanel.Section>
     </ActionPanel>
-  )
-}
-
+  );
+};
